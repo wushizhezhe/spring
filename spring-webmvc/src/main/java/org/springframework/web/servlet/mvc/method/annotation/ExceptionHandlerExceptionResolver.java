@@ -202,7 +202,8 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 		this.contentNegotiationManager = contentNegotiationManager;
 	}
 
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

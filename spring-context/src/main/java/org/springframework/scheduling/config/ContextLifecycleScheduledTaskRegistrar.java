@@ -35,7 +35,8 @@ public class ContextLifecycleScheduledTaskRegistrar extends ScheduledTaskRegistr
 	private ApplicationContext applicationContext;
 
 
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

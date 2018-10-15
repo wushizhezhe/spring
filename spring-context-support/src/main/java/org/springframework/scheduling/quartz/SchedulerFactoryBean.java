@@ -431,7 +431,8 @@ public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBe
 		}
 	}
 
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

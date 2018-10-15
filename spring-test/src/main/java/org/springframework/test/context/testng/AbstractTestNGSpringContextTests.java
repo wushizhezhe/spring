@@ -114,7 +114,8 @@ public abstract class AbstractTestNGSpringContextTests implements IHookable, App
 	 *
 	 * @param applicationContext the applicationContext to set
 	 */
-	public final void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public final void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

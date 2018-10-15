@@ -119,7 +119,8 @@ public class JobDetailBean extends JobDetail
 		this.beanName = beanName;
 	}
 
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

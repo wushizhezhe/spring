@@ -106,7 +106,8 @@ public class ScheduledAnnotationBeanPostProcessor
 		this.embeddedValueResolver = resolver;
 	}
 
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

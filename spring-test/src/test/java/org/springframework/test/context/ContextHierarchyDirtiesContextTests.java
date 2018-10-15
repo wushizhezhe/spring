@@ -116,7 +116,8 @@ public class ContextHierarchyDirtiesContextTests {
 		}
 
 
-		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		@Override
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 			ContextHierarchyDirtiesContextTests.context = applicationContext;
 		}
 	}

@@ -96,7 +96,8 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 	private ConfigurableApplicationContext applicationContext;
 
 
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	@Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
 		Assert.isTrue(applicationContext instanceof ConfigurableApplicationContext,
 				"ApplicationContext does not implement ConfigurableApplicationContext");
 		this.applicationContext = (ConfigurableApplicationContext) applicationContext;
