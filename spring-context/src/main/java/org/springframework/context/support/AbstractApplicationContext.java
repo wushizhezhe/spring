@@ -642,32 +642,50 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<String>();
+		//对BeanDefinitionRegistry类型的处理
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors =
 					new LinkedList<BeanDefinitionRegistryPostProcessor>();
+			/*
+			 * 硬编码注册的后处理器
+			 */
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
+					//对于BeanDefinitionRegistryPostProcessor类型，在BeanFactoryPostProcessor
+					//的基础上还有自己定义的方法，需要先调用
 					BeanDefinitionRegistryPostProcessor registryPostProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
 					registryPostProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryPostProcessors.add(registryPostProcessor);
 				}
 				else {
+					//记录常规BeanFactoryPostProcessor
 					regularPostProcessors.add(postProcessor);
 				}
 			}
+			/*
+			 * 配置注册的后处理器
+			 */
 			Map<String, BeanDefinitionRegistryPostProcessor> beanMap =
 					beanFactory.getBeansOfType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessorBeans =
 					new ArrayList<BeanDefinitionRegistryPostProcessor>(beanMap.values());
 			OrderComparator.sort(registryPostProcessorBeans);
 			for (BeanDefinitionRegistryPostProcessor postProcessor : registryPostProcessorBeans) {
+				//BeanDefinitionRegistryPostProcessor的特殊处理
 				postProcessor.postProcessBeanDefinitionRegistry(registry);
 			}
+
+			//激活postProcessBeanFactory方法，之前激活的是postProcessBeanDefinitionRegistry
+			//硬编码设置的BeanDefinitionRegistryPostProcessor
 			invokeBeanFactoryPostProcessors(registryPostProcessors, beanFactory);
+
+			//配置的BeanDefinitionRegistryPostProcessor
 			invokeBeanFactoryPostProcessors(registryPostProcessorBeans, beanFactory);
+
+			//常规的BeanFactoryPostProcessor
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 			processedBeans.addAll(beanMap.keySet());
 		}
@@ -678,6 +696,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
+		//对于配置中读取的BeanFactoryPostProcessor
 		String[] postProcessorNames =
 				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
@@ -686,9 +705,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		List<BeanFactoryPostProcessor> priorityOrderedPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 		List<String> orderedPostProcessorNames = new ArrayList<String>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<String>();
+		//对后处理器进行分类
 		for (String ppName : postProcessorNames) {
 			if (processedBeans.contains(ppName)) {
 				// skip - already processed in first phase above
+				//已经处理过的
 			}
 			else if (isTypeMatch(ppName, PriorityOrdered.class)) {
 				priorityOrderedPostProcessors.add(beanFactory.getBean(ppName, BeanFactoryPostProcessor.class));
@@ -702,6 +723,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
+		//按照优先级排序
 		OrderComparator.sort(priorityOrderedPostProcessors);
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
 
@@ -710,10 +732,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		for (String postProcessorName : orderedPostProcessorNames) {
 			orderedPostProcessors.add(getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
+		//按照order排序
 		OrderComparator.sort(orderedPostProcessors);
 		invokeBeanFactoryPostProcessors(orderedPostProcessors, beanFactory);
 
 		// Finally, invoke all other BeanFactoryPostProcessors.
+		// 无序 直接调用
 		List<BeanFactoryPostProcessor> nonOrderedPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(getBean(postProcessorName, BeanFactoryPostProcessor.class));
