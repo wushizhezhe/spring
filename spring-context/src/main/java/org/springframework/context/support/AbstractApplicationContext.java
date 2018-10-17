@@ -767,14 +767,23 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
+		/*
+		 * BeanPostProcessorChecker是一个普通的信息打印，可能会有些情况，
+		 * 当spring的配置中的后处理器还没有被注册就已经开始了bean的初始化时
+		 * 便会打印出BeanPostProcessorChecker
+		 */
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
+		//使用PriorityOrdered保证顺序
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<BeanPostProcessor>();
+		//MergedBeanDefinitionPostProcessor
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<BeanPostProcessor>();
+		//使用Ordered保证顺序
 		List<String> orderedPostProcessorNames = new ArrayList<String>();
+		//无序
 		List<String> nonOrderedPostProcessorNames = new ArrayList<String>();
 		for (String ppName : postProcessorNames) {
 			if (isTypeMatch(ppName, PriorityOrdered.class)) {
@@ -793,10 +802,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
+		//首先，注册所有实现PriorityOrdered的BeanPostProcessors
 		OrderComparator.sort(priorityOrderedPostProcessors);
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
 		// Next, register the BeanPostProcessors that implement Ordered.
+		//其次，注册所有实现Ordered的BeanPostProcessors
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		for (String ppName : orderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -809,6 +820,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
 		// Now, register all regular BeanPostProcessors.
+		//再次，注册所有无序的BeanPostProcessors
 		List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		for (String ppName : nonOrderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -820,9 +832,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
 		// Finally, re-register all internal BeanPostProcessors.
+		//再次，注册所有MergedBeanDefinitionPostProcessor类型的BeanPostProcessors，
+		//并非重复注册，在beanFactory.addBeanPostProcessor先移除存在的beanPostProcessors
 		OrderComparator.sort(internalPostProcessors);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
+		//添加ApplicationListener探测器
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector());
 	}
 
