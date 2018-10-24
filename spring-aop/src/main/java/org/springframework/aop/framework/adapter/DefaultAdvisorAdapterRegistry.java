@@ -16,15 +16,14 @@
 
 package org.springframework.aop.framework.adapter;
 
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.aopalliance.aop.Advice;
-import org.aopalliance.intercept.MethodInterceptor;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
 
 /**
  * Default implementation of the {@link AdvisorAdapterRegistry} interface.
@@ -57,6 +56,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		if (adviceObject instanceof Advisor) {
 			return (Advisor) adviceObject;
 		}
+		//因为此封装方法只针对Advisor和Advice两种类型的数据有效，如果不是将不能封装
 		if (!(adviceObject instanceof Advice)) {
 			throw new UnknownAdviceTypeException(adviceObject);
 		}
@@ -65,6 +65,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 			// So well-known it doesn't even need an adapter.
 			return new DefaultPointcutAdvisor(advice);
 		}
+		//如果存在Advisor的适配器那么也同样需要进行封装
 		for (AdvisorAdapter adapter : this.adapters) {
 			// Check that it is supported.
 			if (adapter.supportsAdvice(advice)) {

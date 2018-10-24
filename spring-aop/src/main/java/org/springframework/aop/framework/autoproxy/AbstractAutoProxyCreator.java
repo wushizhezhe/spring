@@ -444,6 +444,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	}
 
 	/**
+	 * 创建代理
 	 * Create an AOP proxy for the given bean.
 	 * @param beanClass the class of the bean
 	 * @param beanName the name of the bean
@@ -459,25 +460,33 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 
 		ProxyFactory proxyFactory = new ProxyFactory();
 		// Copy our properties (proxyTargetClass etc) inherited from ProxyConfig.
+		// 获取当前类中相关的属性
 		proxyFactory.copyFrom(this);
 
+		//决定对于给定的bean是否应该使用TargetClass而不是他的接口代理
+		//检查ProxyTargetClass设置以及preserveTargetClass
 		if (!shouldProxyTargetClass(beanClass, beanName)) {
 			// Must allow for introductions; can't just set interfaces to
 			// the target's interfaces only.
 			Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, this.proxyClassLoader);
 			for (Class<?> targetInterface : targetInterfaces) {
+				//添加代理接口
 				proxyFactory.addInterface(targetInterface);
 			}
 		}
 
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		for (Advisor advisor : advisors) {
+			//加入增强器
 			proxyFactory.addAdvisor(advisor);
 		}
-
+		//设置要代理的类
 		proxyFactory.setTargetSource(targetSource);
+		//定制代理
 		customizeProxyFactory(proxyFactory);
 
+		//用来控制代理工厂被配置之后，是否还允许修改通知
+		//缺省值为false（即再代理被配置之后不允许修改代理的配置）
 		proxyFactory.setFrozen(this.freezeProxy);
 		if (advisorsPreFiltered()) {
 			proxyFactory.setPreFiltered(true);
@@ -527,10 +536,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 */
 	protected Advisor[] buildAdvisors(String beanName, Object[] specificInterceptors) {
 		// Handle prototypes correctly...
+		//解析注册所有的InterceptorName
 		Advisor[] commonInterceptors = resolveInterceptorNames();
 
 		List<Object> allInterceptors = new ArrayList<Object>();
 		if (specificInterceptors != null) {
+			//加入拦截器
 			allInterceptors.addAll(Arrays.asList(specificInterceptors));
 			if (commonInterceptors != null) {
 				if (this.applyCommonInterceptorsFirst) {
@@ -550,6 +561,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 
 		Advisor[] advisors = new Advisor[allInterceptors.size()];
 		for (int i = 0; i < allInterceptors.size(); i++) {
+			//拦截器进行封装转化成Advisor
 			advisors[i] = this.advisorAdapterRegistry.wrap(allInterceptors.get(i));
 		}
 		return advisors;

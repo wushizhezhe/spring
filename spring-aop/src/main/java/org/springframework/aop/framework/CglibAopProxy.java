@@ -170,9 +170,11 @@ final class CglibAopProxy implements AopProxy, Serializable {
 			}
 
 			// Validate the class, writing log messages as necessary.
+			//验证class
 			validateClassIfNecessary(proxySuperClass);
 
 			// Configure CGLIB Enhancer...
+			//创建及配置Enhancer
 			Enhancer enhancer = createEnhancer();
 			if (classLoader != null) {
 				enhancer.setClassLoader(classLoader);
@@ -187,6 +189,7 @@ final class CglibAopProxy implements AopProxy, Serializable {
 			enhancer.setStrategy(new MemorySafeUndeclaredThrowableStrategy(UndeclaredThrowableException.class));
 			enhancer.setInterceptDuringConstruction(false);
 
+			//设置拦截器
 			Callback[] callbacks = getCallbacks(rootClass);
 			Class<?>[] types = new Class<?>[callbacks.length];
 			for (int x = 0; x < types.length; x++) {
@@ -198,6 +201,7 @@ final class CglibAopProxy implements AopProxy, Serializable {
 			enhancer.setCallbacks(callbacks);
 
 			// Generate the proxy class and create a proxy instance.
+			//生成代理类以及创建代理
 			Object proxy;
 			if (this.constructorArgs != null) {
 				proxy = enhancer.create(this.constructorArgTypes, this.constructorArgs);
@@ -268,11 +272,13 @@ final class CglibAopProxy implements AopProxy, Serializable {
 
 	private Callback[] getCallbacks(Class<?> rootClass) throws Exception {
 		// Parameters used for optimisation choices...
+		//对于expose-proxy属性的处理
 		boolean exposeProxy = this.advised.isExposeProxy();
 		boolean isFrozen = this.advised.isFrozen();
 		boolean isStatic = this.advised.getTargetSource().isStatic();
 
 		// Choose an "aop" interceptor (used for AOP calls).
+		//将拦截器封装在DynamicAdvisedInterceptor中
 		Callback aopInterceptor = new DynamicAdvisedInterceptor(this.advised);
 
 		// Choose a "straight to target" interceptor. (used for calls that are
@@ -295,6 +301,7 @@ final class CglibAopProxy implements AopProxy, Serializable {
 				new StaticDispatcher(this.advised.getTargetSource().getTarget()) : new SerializableNoOp();
 
 		Callback[] mainCallbacks = new Callback[] {
+				//将拦截器链加入Callback中
 				aopInterceptor,  // for normal advice
 				targetInterceptor,  // invoke target without considering advice, if optimized
 				new SerializableNoOp(),  // no override for methods mapped to this
@@ -617,6 +624,7 @@ final class CglibAopProxy implements AopProxy, Serializable {
 				if (target != null) {
 					targetClass = target.getClass();
 				}
+				//获取拦截器链
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 				Object retVal;
 				// Check whether we only have one InvokerInterceptor: that is,
