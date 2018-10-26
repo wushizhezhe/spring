@@ -18,7 +18,6 @@ package org.springframework.asm.util;
 
 import java.io.PrintWriter;
 
-import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.SpringAsmInfo;
 
 /**

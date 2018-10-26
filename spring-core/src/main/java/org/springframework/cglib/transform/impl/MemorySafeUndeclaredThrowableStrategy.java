@@ -16,7 +16,6 @@
 
 package org.springframework.cglib.transform.impl;
 
-import org.springframework.cglib.core.ClassGenerator;
 import org.springframework.cglib.core.DefaultGeneratorStrategy;
 import org.springframework.cglib.core.TypeUtils;
 import org.springframework.cglib.transform.ClassTransformer;
