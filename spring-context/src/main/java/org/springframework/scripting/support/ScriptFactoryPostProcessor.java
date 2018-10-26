@@ -27,7 +27,6 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;
-import org.springframework.asm.Type;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanClassLoaderAware;
