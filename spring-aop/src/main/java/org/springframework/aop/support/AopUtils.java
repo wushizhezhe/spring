@@ -201,6 +201,8 @@ public abstract class AopUtils {
 			return false;
 		}
 
+		//此时的pc表示TransactionAttributeSourcePointCut
+		//pc.getMethodMatcher()返回的正是自身（this）
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
 		IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
 		if (methodMatcher instanceof IntroductionAwareMethodMatcher) {

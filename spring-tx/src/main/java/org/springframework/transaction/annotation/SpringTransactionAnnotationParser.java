@@ -16,15 +16,15 @@
 
 package org.springframework.transaction.annotation;
 
-import java.io.Serializable;
-import java.lang.reflect.AnnotatedElement;
-import java.util.ArrayList;
-
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.transaction.interceptor.NoRollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+
+import java.io.Serializable;
+import java.lang.reflect.AnnotatedElement;
+import java.util.ArrayList;
 
 /**
  * Strategy implementation for parsing Spring's {@link Transactional} annotation.
@@ -47,27 +47,36 @@ public class SpringTransactionAnnotationParser implements TransactionAnnotationP
 
 	public TransactionAttribute parseTransactionAnnotation(Transactional ann) {
 		RuleBasedTransactionAttribute rbta = new RuleBasedTransactionAttribute();
+		//解析propagation
 		rbta.setPropagationBehavior(ann.propagation().value());
+		//解析isolation
 		rbta.setIsolationLevel(ann.isolation().value());
+		//解析timeout
 		rbta.setTimeout(ann.timeout());
+		//解析readOnly
 		rbta.setReadOnly(ann.readOnly());
+		//解析value
 		rbta.setQualifier(ann.value());
 		ArrayList<RollbackRuleAttribute> rollBackRules = new ArrayList<RollbackRuleAttribute>();
+		//解析rollbackFor
 		Class[] rbf = ann.rollbackFor();
 		for (Class rbRule : rbf) {
 			RollbackRuleAttribute rule = new RollbackRuleAttribute(rbRule);
 			rollBackRules.add(rule);
 		}
+		//解析rollbackForClassName
 		String[] rbfc = ann.rollbackForClassName();
 		for (String rbRule : rbfc) {
 			RollbackRuleAttribute rule = new RollbackRuleAttribute(rbRule);
 			rollBackRules.add(rule);
 		}
+		//解析noRollbackFor
 		Class[] nrbf = ann.noRollbackFor();
 		for (Class rbRule : nrbf) {
 			NoRollbackRuleAttribute rule = new NoRollbackRuleAttribute(rbRule);
 			rollBackRules.add(rule);
 		}
+		//解析noRollbackForClassName
 		String[] nrbfc = ann.noRollbackForClassName();
 		for (String rbRule : nrbfc) {
 			NoRollbackRuleAttribute rule = new NoRollbackRuleAttribute(rbRule);
